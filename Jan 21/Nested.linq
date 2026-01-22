@@ -15,15 +15,15 @@
 
 //Artists	.Where(x => x.ArtistId <=5).Dump();
 //Albums.Where(x => x.ArtistId <=5).OrderBy(x => x.ArtistId).Dump();
-
+// Q1
 Artists
 	.OrderBy(x => x.ArtistId)
-	.Select(x => new
+	.Select(x => new ArtistView
 	{
 		Artist = x.Name,
-		MyFavoriteAlbums = x.Albums
+		Albums = x.Albums
 	//	.OrderBy(a => a.Title)
-		.Select(a => new
+		.Select(a => new AlbumView
 		{
 			ID = a.AlbumId,
 			Album = a.Title,
@@ -35,35 +35,17 @@ Artists
 	})
 	.ToList()
 	.Dump();
-
-Artists
-.OrderBy(x => x.ArtistId)
-.Select(x => new
+	
+public class ArtistView
 {
-	Artist = x.Name,
-	MyFavoriteAlbums = x.Albums
-	//	.OrderBy(a => a.Title)
-	.Select(a => new
-	{
-		ID = a.AlbumId,
-		Album = a.Title,
-		Label = a.ReleaseLabel,
-		Year = a.ReleaseYear
-	})
-	.OrderBy(a => a.Album)
-	.ToList()
-})
-.ToList()
-.Dump();
+	public string Artist { get; set; }
+	public List<AlbumView> Albums { get; set; }
+}	
 
-
-//Albums
-//	.OrderBy(a => a.Title)
-//	.Select(a => new
-//	{
-//		Album = a.Title,
-//		Label = a.ReleaseLabel,
-//		Year = a.ReleaseYear
-//	})
-//	.ToList()
-//	.Dump();
+public class AlbumView
+{
+	public int ID { get; set; }
+	public string Album { get; set; }
+	public string Label { get; set; }
+	public int Year { get; set; }
+}
