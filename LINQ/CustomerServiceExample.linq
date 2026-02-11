@@ -2,7 +2,6 @@
   <Connection>
     <ID>65bbaa94-f03d-42a2-bf43-cbe67d7204a0</ID>
     <NamingServiceVersion>3</NamingServiceVersion>
-    <Persist>true</Persist>
     <Server>.</Server>
     <AllowDateOnlyTimeOnly>true</AllowDateOnlyTimeOnly>
     <UseMicrosoftDataSqlClient>true</UseMicrosoftDataSqlClient>
@@ -39,6 +38,18 @@ void Main()
 	codeBehind.GetCustomers("zzz", "999999");
 	codeBehind.ErrorDetails.Dump("No customers with last name of 'zzz' and phone number of 999999");
 
+	//	Pass:	both the last name and phone number were provided
+	codeBehind.GetCustomers("s", "558");
+	codeBehind.Customers.Dump("Pass - Valid last name and phone number");
+
+	//	Pass:	the last name were provided
+	codeBehind.GetCustomers("s", "");
+	codeBehind.Customers.Dump("Pass - Valid last name");
+
+	//	Pass:	phone number were provided
+	codeBehind.GetCustomers("", "558");
+	codeBehind.Customers.Dump("Pass - Valid  phone number");
+
 }
 
 // ———— PART 2: Code Behind → Code Behind Method ————
@@ -64,7 +75,7 @@ public class CodeBehind(TypedDataContext context)
 	// collected error details.
 	private List<string> errorDetails = new();
 	// general error message.
-	private string errorMessage = string.Empty;
+	public string errorMessage = string.Empty;
 	#endregion
 	
 	//	customer search view list returned by the service using GetCustomers()
@@ -166,10 +177,10 @@ public class Library
 									StatusID = c.StatusID,
 									//	if you have a nullable field, use the following pattern
 									//		assume that the i.SubTotal is nullable in the table
-									//	TotalSales = c.Invoices.Sum(i => (decial?)i.SubTotal + i.Tax) ?? 0
+										TotalSales = c.Invoices.Sum(i => (decimal?)i.SubTotal + i.Tax) ?? 0
 									//	if we have no invoices, the TotalSales will be null.  
 									//		we need to add the ?? to handle null-> 0
-									TotalSales = c.Invoices.Sum(i => i.SubTotal + i.Tax)
+									// TotalSales = c.Invoices.Sum(i => i.SubTotal + i.Tax)
 								})
 								.OrderBy(c => c.LastName)
 								.ToList();
