@@ -25,6 +25,19 @@ using BYSResults;
 void Main()
 {
 	CodeBehind codeBehind = new CodeBehind(this); // “this” is LINQPad’s auto Context
+	
+	//	Fail
+	//	Rule:	Customer ID cannot be zero
+	codeBehind.GetCustomer(0);
+	codeBehind.ErrorDetails.Dump("Customer ID cannot be zero");
+	
+	//	Rule:	CustomerID must be valid
+	codeBehind.GetCustomer(100000);
+	codeBehind.ErrorDetails.Dump("No customer was found for ID 100000");
+	
+	//	Pass:	Valid customer ID
+	codeBehind.GetCustomer(1);
+	codeBehind.Customer.Dump("Pass - Valid customer ID");
 
 }
 
@@ -53,6 +66,40 @@ public class CodeBehind(TypedDataContext context)
 	// general error message.
 	private string errorMessage = string.Empty;
 	#endregion
+
+	//	customer edit returned by the service using GetCustomer()
+	//	the visibility should be private in your code behind but we need to set
+	//		it as public so that the Main()/driver can see it.
+	public CustomerEditView Customer = default!;
+
+	public void GetCustomer(int customerID)
+	{
+		//	clear previous error details and messages
+		errorDetails.Clear();
+		errorMessage = string.Empty;
+		feedbackMessage = string.Empty;
+
+		//	wrap the service call in a try/catch to handle unexpected exception
+		try
+		{
+			var result = YourService.GetCustomer(customerID);
+			if (result.IsSuccess)
+			{
+				Customer = result.Value;
+			}
+			else
+			{
+				errorDetails = GetErrorMessages(result.Errors.ToList());
+			}
+		}
+		catch (Exception ex)
+		{
+			//	capture any exception message for display
+			errorMessage = ex.Message;
+		}
+
+
+	}
 
 }
 #endregion
@@ -91,7 +138,7 @@ public class Library
 		if (customerID == 0)
 		{
 			//	need to exit because we have no customer ID
-			result.AddError(new Error("Missing Information",
+			return result.AddError(new Error("Missing Information",
 							"Please provide a valid customer ID"));
 		}
 		#endregion
