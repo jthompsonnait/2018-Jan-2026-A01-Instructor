@@ -1,14 +1,17 @@
 <Query Kind="Program">
   <Connection>
-    <ID>53bfbe22-8f63-4146-92e7-5b76f960a947</ID>
-    <NamingServiceVersion>2</NamingServiceVersion>
+    <ID>a8281abf-dd8f-4afd-9131-4df1f6179d3d</ID>
+    <NamingServiceVersion>3</NamingServiceVersion>
     <Persist>true</Persist>
-    <Server>.</Server>
+    <Driver Assembly="(internal)" PublicKeyToken="no-strong-name">LINQPad.Drivers.EFCore.DynamicDriver</Driver>
     <AllowDateOnlyTimeOnly>true</AllowDateOnlyTimeOnly>
-    <DeferDatabasePopulation>true</DeferDatabasePopulation>
+    <Server>.</Server>
     <Database>OLTP-DMIT2018</Database>
+    <DisplayName>OLTP-DMIT2018-Entity</DisplayName>
     <DriverData>
-      <LegacyMFA>false</LegacyMFA>
+      <EncryptSqlTraffic>True</EncryptSqlTraffic>
+      <PreserveNumeric1>True</PreserveNumeric1>
+      <EFProvider>Microsoft.EntityFrameworkCore.SqlServer</EFProvider>
     </DriverData>
   </Connection>
   <NuGetReference>BYSResults</NuGetReference>
@@ -25,16 +28,16 @@ using BYSResults;
 void Main()
 {
 	CodeBehind codeBehind = new CodeBehind(this); // “this” is LINQPad’s auto Context
-	
+
 	//	Fail
 	//	Rule:	Customer ID cannot be zero
 	codeBehind.GetCustomer(0);
 	codeBehind.ErrorDetails.Dump("Customer ID cannot be zero");
-	
+
 	//	Rule:	CustomerID must be valid
 	codeBehind.GetCustomer(100000);
 	codeBehind.ErrorDetails.Dump("No customer was found for ID 100000");
-	
+
 	//	Pass:	Valid customer ID
 	codeBehind.GetCustomer(1);
 	codeBehind.Customer.Dump("Pass - Valid customer ID");
@@ -162,9 +165,9 @@ public class Library
 						StatusID = c.StatusID,
 						RemoveFromViewFlag = c.RemoveFromViewFlag
 					}).FirstOrDefault();
-					
+
 		// if no customer were found with the customer ID
-		if(customer == null)
+		if (customer == null)
 		{
 			//	need to exit because we did not find any customer
 			result.AddError(new Error("No Customer",
@@ -174,9 +177,30 @@ public class Library
 		{
 			result.WithValue(customer);
 		}
-		
+
 		//	return the result
 		return result;
+	}
+
+	public Result<CustomerEditView> AddEditCustomer(CustomerEditView editCustomer)
+	{
+		//	Create a Result container that will hold either a 
+		//		CustomerEditView object on success or any accumulated errors on 
+		//		failure.
+		var result = new Result<CustomerEditView>();
+
+		#region Business Rules
+		//	These are processing rules that need to be satisfied for valid data
+		//	rule:	customer must be valid (cannot be null)
+		
+		if(editCustomer == null)
+		{
+			//	need to exit because we have not customer view model to add/edit
+			return result.AddError(new Error("Missing Customer",
+									"No customer was supply"));
+		}
+
+		#endregion
 	}
 
 }
