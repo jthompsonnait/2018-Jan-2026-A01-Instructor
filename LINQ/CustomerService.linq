@@ -192,15 +192,90 @@ public class Library
 		#region Business Rules
 		//	These are processing rules that need to be satisfied for valid data
 		//	rule:	customer must be valid (cannot be null)
-		
-		if(editCustomer == null)
+
+		if (editCustomer == null)
 		{
 			//	need to exit because we have not customer view model to add/edit
 			return result.AddError(new Error("Missing Customer",
 									"No customer was supply"));
 		}
 
+		//	rule:	first & last name, phone number and email is required (not empty)
+		if (string.IsNullOrWhiteSpace(editCustomer.FirstName))
+		{
+			result.AddError(new Error("Missing Information", "First name is required"));
+		}
+
+		if (string.IsNullOrWhiteSpace(editCustomer.LastName))
+		{
+			result.AddError(new Error("Missing Information", "Last name is required"));
+		}
+
+		if (string.IsNullOrWhiteSpace(editCustomer.Phone))
+		{
+			result.AddError(new Error("Missing Information", "Phone number is required"));
+		}
+
+		if (string.IsNullOrWhiteSpace(editCustomer.Email))
+		{
+			result.AddError(new Error("Missing Information", "Email is required"));
+		}
+
+		//	rule:	first, last namd and phone number cannot be duplicated (found more than once)
+		if (editCustomer.CustomerID == 0)
+		{
+			bool customerExist = _hogWildContext.Customers.Any(c =>
+								c.FirstName.ToUpper() == editCustomer.FirstName.ToUpper() &&
+								c.LastName.ToUpper() == editCustomer.LastName.ToUpper() &&
+								c.Phone == editCustomer.Phone);
+		}
+
+		//	exit if we have any outstanding errors
+		if (result.IsFailure)
+		{
+			return result;
+		}
 		#endregion
+
+		//	customer entity/record
+		Customer customer = _hogWildContext.Customers
+								//  assuming not deleted/RemoveFromViewFlag customer
+								.Where(c => c.CustomerID == editCustomer.CustomerID)
+								.Select(c => c).FirstOrDefault();
+
+		//	if the customer was not found (CustomerID == 0)
+		//		then we are dealing with a new customer
+		if (customer == null)
+		{
+			customer = new Customer();
+		}
+		
+		//	NOTE:  You do not have to update the primary key "CustomerID"
+		//			This is true for all primary keys for any entity
+		//			- If it is a new customer, the CustomerID will be "0"
+		//			- If it is an existing customer, there is no need to update it.
+		
+		customer.FirstName = editCustomer.FirstName;
+		customer.LastName = editCustomer.LastName;
+		customer.Address1 = editCustomer.Address1;
+		customer.Address2 = editCustomer.Address2;
+		customer.City = editCustomer.City;
+		customer.ProvStateID = editCustomer.ProvStateID;
+		customer.CountryID = editCustomer.CountryID;
+		customer.PostalCode = editCustomer.PostalCode;
+		customer.Email = editCustomer.Email;
+		customer.Phone = editCustomer.Phone;
+		customer.StatusID = editCustomer.StatusID;
+		customer.RemoveFromViewFlag = editCustomer.RemoveFromViewFlag;
+		
+		
+		
+		
+		
+		
+		
+		
+		
 	}
 
 }
