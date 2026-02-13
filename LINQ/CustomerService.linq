@@ -66,8 +66,60 @@ void Main()
 	codeBehind.AddEditCustomer(customer);
 	codeBehind.ErrorDetails.Dump("Duplicated Customer");
 	
+	//	Pass:	Valid new customer
+	string firstName = GenerateName(6);
+	string lastName = GenerateName(9);
+	
+	//	minimum data required to create a new customer.
+	//	The lookup have been simpify and should have included the category name
+	customer = new CustomerEditView()
+	{
+		FirstName = firstName,
+		LastName = lastName,
+		Address1 = "My Street",
+		Address2 = "My Street 2",
+		City = "Edmonton",
+		ProvStateID = Lookups.Where(l => l.Name == "Alberta")
+						.Select(l => l.LookupID).FirstOrDefault(),
+		CountryID = Lookups.Where(l => l.Name == "Canada")
+						.Select(l => l.LookupID).FirstOrDefault(),
+		PostalCode = "T1C3T1",
+		Phone = "7805551212",
+		Email = $"{firstName}.{lastName}@bb.cc",
+		StatusID = Lookups.Where(l => l.Name == "Silver")
+						.Select(l => l.LookupID).FirstOrDefault(),
+		RemoveFromViewFlag = false
+	};
+	
+	//	get the last two customer records to use as a comparison before we added the new record
+	Customers.OrderByDescending(c => c.CustomerID).Take(2).Dump("Before adding a new customer");
+	
+	//	add the new customer to the database
+	codeBehind.AddEditCustomer(customer);
+	codeBehind.Customer.Dump("New Customer");
+
+	//	get the last two customer records to use as a comparison after we added the new record
+	Customers.OrderByDescending(c => c.CustomerID).Take(2).Dump("After adding a new customer");
 	#endregion
 	
+	#region Edit Customer
+	//	get previous customer
+	customer = codeBehind.Customer;
+	customer.FirstName = GenerateName(6);
+	customer.LastName = GenerateName(9);
+	customer.Address1 = $"{GenerateName(14)} Avenue";
+
+
+	//	get the last two customer records to use as a comparison before we edit the previous record
+	Customers.OrderByDescending(c => c.CustomerID).Take(2).Dump("Before editing the previous customer");
+
+	//	update the database with the edited customer
+	codeBehind.AddEditCustomer(customer);
+	codeBehind.Customer.Dump("Edit Customer");
+
+	//	get the last two customer records to use as a comparison after we edit the previous record
+	Customers.OrderByDescending(c => c.CustomerID).Take(2).Dump("After editing the previous customer");
+	#endregion
 	
 	
 	
@@ -410,5 +462,40 @@ public static List<string> GetErrorMessages(List<Error> errorMessage)
 
 	// Return the populated list of error message strings
 	return errorList;
+}
+/// <summary>
+/// Generates a random name of a given length.
+/// The generated name follows a pattern of alternating consonants and vowels.
+/// </summary>
+/// <param name="len">The desired length of the generated name.</param>
+/// <returns>A random name of the specified length.</returns>
+public static string GenerateName(int len)
+{
+	// Create a new Random instance.
+	Random r = new Random();
+
+	// Define consonants and vowels to use in the name generation.
+	string[] consonants = { "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "l", "n", "p", "q", "r", "s", "sh", "zh", "t", "v", "w", "x" };
+	string[] vowels = { "a", "e", "i", "o", "u", "ae", "y" };
+
+	string Name = "";
+
+	// Start the name with an uppercase consonant and a vowel.
+	Name += consonants[r.Next(consonants.Length)].ToUpper();
+	Name += vowels[r.Next(vowels.Length)];
+
+	// Counter for tracking the number of characters added.
+	int b = 2;
+
+	// Add alternating consonants and vowels until we reach the desired length.
+	while (b < len)
+	{
+		Name += consonants[r.Next(consonants.Length)];
+		b++;
+		Name += vowels[r.Next(vowels.Length)];
+		b++;
+	}
+
+	return Name;
 }
 #endregion
