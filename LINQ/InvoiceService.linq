@@ -1,7 +1,7 @@
 <Query Kind="Program">
   <Connection>
-    <ID>a8281abf-dd8f-4afd-9131-4df1f6179d3d</ID>
-    <NamingServiceVersion>3</NamingServiceVersion>
+    <ID>813ec320-8be0-4b91-8ec8-c1549d53aaea</ID>
+    <NamingServiceVersion>2</NamingServiceVersion>
     <Persist>true</Persist>
     <Driver Assembly="(internal)" PublicKeyToken="no-strong-name">LINQPad.Drivers.EFCore.DynamicDriver</Driver>
     <AllowDateOnlyTimeOnly>true</AllowDateOnlyTimeOnly>
@@ -43,7 +43,7 @@ void Main()
 	bool addInvoice = false;
 
 	//	edit invoice
-	bool editInvoice = false;
+	bool editInvoice = true;
 
 	#region GetCustomerInvoice
 	if (getCustomerInvoice)

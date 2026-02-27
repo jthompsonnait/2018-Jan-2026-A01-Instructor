@@ -13,12 +13,18 @@
 
 
   <ItemGroup>
+    <PackageReference Include="BYSResults" Version="1.2.3" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.*" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.*" />
-    <PackageReference Include="MudBlazor" Version="8.*" />
+    <PackageReference Include="MudBlazor" Version="9.0.0" />
     <PackageReference Include="Extensions.MudBlazor.StaticInput" Version="3.*" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\HogWildSystem\HogWildSystem.csproj" />
   </ItemGroup>
 
 </Project>
