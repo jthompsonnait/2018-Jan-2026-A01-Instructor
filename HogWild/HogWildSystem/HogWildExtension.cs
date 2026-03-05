@@ -1,4 +1,5 @@
-﻿using HogWildSystem.DAL;
+﻿using HogWildSystem.BLL;
+using HogWildSystem.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -16,6 +17,7 @@ namespace HogWildSystem
 
         // The method name can be anything, but it must match the name used when calling it in
         // your Program.cs file using builder.Services.XXXX(options => ...).
+        //  Rename this to your module ieL  AddPODependencies(), AddReceivingDependencies
         public static void AddBackendDependencies(this IServiceCollection services,
             Action<DbContextOptionsBuilder> options)
         {
@@ -27,6 +29,20 @@ namespace HogWildSystem
             // configures the options for the DbContext, including specifying the database
             // connection string.
             services.AddDbContext<HogWildContext>(options);
+
+            //  adding any services that you create in the class library (bll)
+            //  using .AddTransient<t>(...)
+            //  working verison
+            services.AddTransient<WorkingVersionService>((ServiceProvider) =>
+            {
+                //  Retrieve an instance of HogWIldContext from the service provider
+                var context = ServiceProvider.GetService<HogWildContext>();
+
+                //  Create a new instance of WorkingVersionService
+                //      passing the HogWildContext instance as a parameter
+                return new WorkingVersionService(context);
+
+            });
         }
     }
 }

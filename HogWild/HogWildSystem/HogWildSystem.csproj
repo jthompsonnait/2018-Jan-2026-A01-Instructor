@@ -11,9 +11,4 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.13" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="BLL\" />
-    <Folder Include="ViewModels\" />
-  </ItemGroup>
-
 </Project>
