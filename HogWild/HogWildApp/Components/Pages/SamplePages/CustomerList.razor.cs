@@ -42,7 +42,39 @@ namespace HogWildApp.Components.Pages.SamplePages
         //  search for existing customers
         private void Search()
         {
+            //	clear previous error details and messages
+            errorDetails.Clear();
+            errorMessage = string.Empty;
+            feedbackMessage = string.Empty;
+            noRecords = false;
+            Customers.Clear();
 
+            //	wrap the service call in a try/catch to handle unexpected exception
+            try
+            {
+                var result = CustomerService.GetCustomers(lastName, phone);
+                if (result.IsSuccess)
+                {
+                    Customers = result.Value;
+                }
+                else
+                {
+                    //  set noRecord
+                    //  could be written cleaner
+                    //  noRecords = result.Errors.Any(e => e.Code == "No Customer");
+                    if (result.Errors.Any(e => e.Code == "No Customer"))
+                    {
+                        noRecords = true;
+                    }
+
+                    errorDetails = BlazorHelperClass.GetErrorMessages(result.Errors.ToList());
+                }
+            }
+            catch (Exception ex)
+            {
+                //	capture any exception message for display
+                errorMessage = ex.Message;
+            }
         }
 
         //  new customer

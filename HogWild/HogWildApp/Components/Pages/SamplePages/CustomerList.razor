@@ -43,3 +43,50 @@
         New
     </MudButton>
 </MudStack>
+
+@if (Customers.Count > 0)
+{
+    <MudDataGrid Items="Customers"
+                 Striped="true"
+                 FixedFooter="true"
+                 FixedHeader="true"
+                 Height="65vh">
+        <Columns>
+            <TemplateColumn>
+                <HeaderTemplate>
+                    Actions
+                </HeaderTemplate>
+                <CellTemplate>
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               OnClick="() => EditCustomer(context.Item.CustomerID)">
+                        Edit
+                    </MudButton>
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Secondary"
+                               OnClick="() => NewInvoice(context.Item.CustomerID)">
+                        Edit
+                    </MudButton>
+                </CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn Property="x => x.FirstName" Title="First Name"/>
+            <PropertyColumn Property="x => x.LastName" Title="Last Name" />
+            <PropertyColumn Property="x => x.City" Title="City" />
+            <PropertyColumn Property="x => x.Phone" Title="Phone" />
+            <PropertyColumn Property="x => x.Email" Title="Email" />
+            <PropertyColumn Property="@(x => x.TotalSales.HasValue 
+                                          ? x.TotalSales.Value.ToString("C2")
+                                          : string.Empty)" Title="Total Sales" />
+        </Columns>
+        <NoRecordsContent>
+            <MudText Typo="Typo.h6">
+                @(noRecords ? "No customer found"
+                            : "Please search for customers")
+            </MudText>
+        </NoRecordsContent>
+        <PagerContent>
+            <MudDataGridPager/>
+        </PagerContent>
+    </MudDataGrid>
+
+}
