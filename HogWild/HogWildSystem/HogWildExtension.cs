@@ -32,7 +32,7 @@ namespace HogWildSystem
 
             //  adding any services that you create in the class library (bll)
             //  using .AddTransient<t>(...)
-            //  working verison
+            //  working version
             services.AddTransient<WorkingVersionService>((ServiceProvider) =>
             {
                 //  Retrieve an instance of HogWIldContext from the service provider
@@ -41,6 +41,18 @@ namespace HogWildSystem
                 //  Create a new instance of WorkingVersionService
                 //      passing the HogWildContext instance as a parameter
                 return new WorkingVersionService(context);
+
+            });
+
+            //  customer service
+            services.AddTransient<CustomerService>((ServiceProvider) =>
+            {
+                //  Retrieve an instance of HogWIldContext from the service provider
+                var context = ServiceProvider.GetService<HogWildContext>();
+
+                //  Create a new instance of CustomerService
+                //      passing the HogWildContext instance as a parameter
+                return new CustomerService(context);
 
             });
         }
