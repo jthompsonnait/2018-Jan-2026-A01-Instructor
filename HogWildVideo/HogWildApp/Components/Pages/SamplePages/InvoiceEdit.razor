@@ -1,0 +1,228 @@
+﻿@page "/SamplePages/InvoiceEdit/{InvoiceID:int}/{CustomerID:int}/{EmployeeID:int}"
+<PageTitle>Invoice Edit</PageTitle>
+
+<MudText Typo="Typo.h3">
+    @(InvoiceID == 0 ? "New Invoice" : $"Invoice #: {InvoiceID}")
+</MudText>
+
+
+@if (hasError)
+{
+    <MudAlert Elevation="2"
+              Severity="Severity.Error"
+              Dense="true">
+        <MudText Typo="Typo.h3">@errorMessage</MudText>
+        @foreach (var error in errorDetails)
+        {
+            <MudText Typo="Typo.body2">@error</MudText>
+        }
+    </MudAlert>
+}
+
+@if (hasFeedback)
+{
+    <MudAlert Elevation="2"
+              Severity="Severity.Info"
+              Dense="true">
+        <MudText Typo="Typo.body2">@feedbackMessage</MudText>
+    </MudAlert>
+}
+
+<!--  Display invoice info and totals-->
+<MudGrid>
+    <!-- Left section: Invoice meta data-->
+    <MudItem sm="12" md="12">
+        <MudPaper Elevation="2" Class="pa-2" Height="145px">
+            <MudStack>
+                <!-- Invoice Date-->
+                <MudText Typo="Typo.h6" Align="Align.Center">
+                    <strong>Invoice Date: </strong>@invoice.InvoiceDate.ToShortDateString()
+                </MudText>
+                <!-- Employee Name-->
+                <MudText Typo="Typo.h6" Align="Align.Center">
+                    <strong>Employee: </strong>@invoice.EmployeeName
+                </MudText>
+                <!-- Customer Name-->
+                <MudText Typo="Typo.h6" Align="Align.Center">
+                    <strong>Customer: </strong>@invoice.CustomerName
+                </MudText>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+    <!-- Right section: Totals-->
+    <MudItem sm="12" md="12">
+        <MudPaper Elevation="2" Class="pa-2" Height="145px">
+            <MudStack>
+                <!-- Sub Totals-->
+                <MudText Typo="Typo.h6" Align="Align.Center">
+                    <strong>Sub Totals: </strong>@invoice.SubTotal.ToString("C2")
+                </MudText>
+                <!-- Tax -->
+                <MudText Typo="Typo.h6" Align="Align.Center">
+                    <strong>Tax: </strong>@invoice.Tax.ToString("C2")
+                </MudText>
+                <!-- Divider Line -->
+                <MudDivider DividerType="DividerType.Middle" />
+                <!-- Total-->
+                <MudText Typo="Typo.h6" Align="Align.Center">
+                    <strong>Total: </strong>@invoice.Total.ToString("C2")
+                </MudText>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+<!-- Save/Cancel-->
+<MudStack Row="true"
+          Class="mt-2"
+          AlignItems="AlignItems.Center"
+          Justify="Justify.Center">
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               OnClick="Save">
+        Save
+    </MudButton>
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Error"
+               OnClick="Close">
+        Close
+    </MudButton>
+</MudStack>
+
+
+<!-- Invoice lines grid (editable)-->
+<!-- You must have the EditMode, EditTrigger, and ReadOnly false to make a grid editable-->
+<MudDataGrid Items="invoice.InvoiceLines"
+             Striped="true"
+             Dense="true"
+             Class="mt-2"
+             FixedFooter="true"
+             FixedHeader="true"
+             Height="23vh"
+             EditMode="DataGridEditMode.Cell"
+             EditTrigger="DataGridEditTrigger.OnRowClick"
+             ReadOnly="false">
+
+    <Columns>
+
+        <!-- Remove part button -->
+        <TemplateColumn Editable="false">
+            <CellTemplate>
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Error"
+                           OnClick="@(() => DeleteInvoiceLine(context.Item))"
+                           StartIcon="@Icons.Material.Filled.Delete">
+                    Remove
+                </MudButton>
+            </CellTemplate>
+        </TemplateColumn>
+
+        <PropertyColumn Property="x => x.PartID" Title="Part ID" Editable="false" />
+        <PropertyColumn Property="x => x.Description" Title="Description" Editable="false" />
+        <PropertyColumn Property="x => x.Quantity" Title="QTY (Max QOH)" Editable="true">
+            <EditTemplate>
+                <MudNumericField Value="context.Item.Quantity"
+                                 ValueChanged="(int newQuantity) => QuantityEdited(context.Item, newQuantity)"
+                                 Immediate="true"
+                                 Margin="Margin.Dense"
+                                 For="@(() => context.Item.Quantity)"
+                                 Min="0" />
+            </EditTemplate>
+        </PropertyColumn>
+
+        <PropertyColumn Property="x => x.Price" Title="Price" Format="C2" Editable="true">
+            <EditTemplate>
+                <MudNumericField Value="context.Item.Price"
+                                 ValueChanged="(decimal newPrice) => PriceEdited(context.Item, newPrice)"
+                                 Immediate="true"
+                                 Margin="Margin.Dense"
+                                 For="@(() => context.Item.Price)"
+                                 Min="0.00m" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.ExtentPrice" Title="Ext. Price" Format="C2" Editable="false" />
+
+        <TemplateColumn Editable="false">
+            <CellTemplate>
+                <MudButton OnClick="@(() => SyncPrice(context.Item))"
+                           Size="Size.Small"
+                           StartIcon="@Icons.Material.Filled.Refresh">
+                </MudButton>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+    <NoRecordsContent>
+        <MudText Typo="Typo.h6">No Invoice Lines were found</MudText>
+    </NoRecordsContent>
+    <PagerContent>
+        <MudDataGridPager />
+    </PagerContent>
+</MudDataGrid>
+
+<!-- Part search filters (category + description)-->
+<MudStack Row
+          Class="mt-2"
+          AlignItems="AlignItems.Center"
+          Justify="Justify.FlexStart"
+          Spacing="4">
+    <!-- Category dropdown -->
+    <MudSelect @bind-Value="categoryID"
+               Variant="Variant.Outlined"
+               Placeholder="Category Optional">
+        @foreach (var category in partCategories)
+        {
+            <MudSelectItem T="int?" Value="@category.LookupId">@category.Name</MudSelectItem>
+        }
+        <!-- Description Input-->
+        <MudTextField @bind-Value="description"
+                      Label="Description"
+                      Variant="Variant.Outlined"
+                      Immediate="true">
+        </MudTextField>
+        <!-- Search Button-->
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Secondary"
+                   OnClick="SearchParts"
+                   Class="ml-4">
+            Search
+        </MudButton>
+    </MudSelect>
+</MudStack>
+
+
+
+
+<!--  Parts result grid (filtered and excluding parts already on the invoice -->
+<MudDataGrid Items="parts.Where(p => !invoice.InvoiceLines.Select(il => il.PartID).Contains(p.PartID))"
+             Striped="true"
+             Dense="true"
+             Class="mt-2"
+             FixedFooter="true"
+             FixedHeader="true"
+             Height="23vh">
+    <Columns>
+        <!-- Add part button-->
+        <TemplateColumn>
+            <CellTemplate>
+                <MudButton Variant="Variant.Text"
+                           Color="Color.Success"
+                           OnClick="@(() => AddPart(context.Item.PartID))"
+                           Class="ml-4">
+                    Add
+                </MudButton>
+            </CellTemplate>
+        </TemplateColumn>
+        <!-- Part properties-->
+        <PropertyColumn Property="x => x.PartID" Title="Part ID" />
+        <PropertyColumn Property="x => x.Description" Title="Description" />
+        <PropertyColumn Property="@(x => x.Cost.ToString("C2"))" Title="Cost" />
+        <PropertyColumn Property="@(x => x.Price.ToString("C2"))" Title="Price" />
+        <PropertyColumn Property="x => x.ROL" Title="ROL" />
+        <PropertyColumn Property="x => x.QOH" Title="QOH" />
+    </Columns>
+    <NoRecordsContent>
+        <MudText Typo="Typo.h6">@(noParts ? "No parts match your search" : "Please search for parts")</MudText>
+    </NoRecordsContent>
+    <PagerContent>
+        <MudDataGridPager />
+    </PagerContent>
+</MudDataGrid>

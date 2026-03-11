@@ -81,5 +81,61 @@ namespace HogWildSystem.BLL
             //	return the result
             return result.WithValue(customers);
         }
+
+        public Result<CustomerEditView> GetCustomer(int customerID)
+        {
+            //	Create a Result container that will hold either a 
+            //		CustomerEditView object on success or any accumulated errors on 
+            //		failure.
+            var result = new Result<CustomerEditView>();
+
+            #region Business Rules
+            //	These are processing rules that need to be satisfied for valid data
+            //	rule:	customerID must be valid (cannot equal zero)
+            //	rule:	RemoveFromViewFlag must be false (soft delete)
+
+            if (customerID == 0)
+            {
+                //	need to exit because we have no customer ID
+                return result.AddError(new Error("Missing Information",
+                                "Please provide a valid customer ID"));
+            }
+            #endregion
+
+            var customer = _hogWildContext.Customers
+                        .Where(c => c.CustomerID == customerID &&
+                                c.RemoveFromViewFlag == false)  //  !c.RemoveFromViewFlag 
+                        .Select(c => new CustomerEditView
+                        {
+                            CustomerID = c.CustomerID,
+                            FirstName = c.FirstName,
+                            LastName = c.LastName,
+                            Address1 = c.Address1,
+                            Address2 = c.Address2,
+                            City = c.City,
+                            ProvStateID = c.ProvStateID,
+                            CountryID = c.CountryID,
+                            PostalCode = c.PostalCode,
+                            Phone = c.Phone,
+                            Email = c.Email,
+                            StatusID = c.StatusID,
+                            RemoveFromViewFlag = c.RemoveFromViewFlag
+                        }).FirstOrDefault();
+
+            // if no customer were found with the customer ID
+            if (customer == null)
+            {
+                //	need to exit because we did not find any customer
+                result.AddError(new Error("No Customer",
+                        $"No customer were found with customer ID :{customerID}"));
+            }
+            else
+            {
+                result.WithValue(customer);
+            }
+
+            //	return the result
+            return result;
+        }
     }
 }
