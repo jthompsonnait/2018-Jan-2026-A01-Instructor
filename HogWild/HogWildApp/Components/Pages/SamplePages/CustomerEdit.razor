@@ -70,6 +70,17 @@ else
                           RequiredError="City is required"
                           MaxLength="50"
                           Immediate="true" />
+            <MudSelect @bind-Value="customer.ProvStateID"
+                       Variant="Variant.Outlined"
+                       Label="Province"
+                       Placeholder="Please select a province"
+                       Required="true"
+                       RequiredError="You must select a Province">
+                       @foreach (var item in provinces)
+                       {
+                           <MudSelectItem T="int?" Value="@item.LookupID">@item.Name</MudSelectItem>
+                       }
+            </MudSelect>
         </MudItem>
     </MudGrid>
 </MudForm>

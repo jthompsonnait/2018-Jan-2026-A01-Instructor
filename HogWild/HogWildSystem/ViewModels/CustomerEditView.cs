@@ -15,14 +15,14 @@ namespace HogWildSystem.ViewModels
         public string Address2 { get; set; }
         public string City { get; set; }
         //	Prov/State ID.	Value will use a dropdown and the Lookup View Model
-        public int ProvStateID { get; set; }
+        public int? ProvStateID { get; set; }
         //	Country ID.	Value will use a dropdown and the Lookup View Model
-        public int CountryID { get; set; }
+        public int? CountryID { get; set; }
         public string PostalCode { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }
         //	Stauus ID.	Value will use a dropdown and the Lookup View Model
-        public int StatusID { get; set; }
+        public int? StatusID { get; set; }
         //	soft delete
         public bool RemoveFromViewFlag { get; set; }
     }

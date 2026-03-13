@@ -55,6 +55,18 @@ namespace HogWildSystem
                 return new CustomerService(context);
 
             });
+
+            //  category/lookup service
+            services.AddTransient<CategoryLookupService>((ServiceProvider) =>
+            {
+                //  Retrieve an instance of HogWIldContext from the service provider
+                var context = ServiceProvider.GetService<HogWildContext>();
+
+                //  Create a new instance of CategoryLookupService
+                //      passing the HogWildContext instance as a parameter
+                return new CategoryLookupService(context);
+
+            });
         }
     }
 }
