@@ -90,7 +90,6 @@ namespace HogWildApp.Components.Pages.SamplePages
                     if (result.IsSuccess)
                     {
                         customer = result.Value;
-                        feedbackMessage = "Data was successfully saved";
 
                     }
                     else
