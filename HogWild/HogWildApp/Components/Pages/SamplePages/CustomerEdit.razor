@@ -56,7 +56,19 @@ else
                           Variant="Variant.Outlined"
                           Required="true"
                           RequiredError="Address 1 is required"
-                          MaxLength="20"
+                          MaxLength="50"
+                          Immediate="true" />
+            <MudTextField Label="Address 2"
+                          @bind-Value="customer.Address2"
+                          Variant="Variant.Outlined"
+                          MaxLength="0"
+                          Immediate="true" />
+            <MudTextField Label="City"
+                          @bind-Value="customer.City"
+                          Variant="Variant.Outlined"
+                          Required="true"
+                          RequiredError="City is required"
+                          MaxLength="50"
                           Immediate="true" />
         </MudItem>
     </MudGrid>
