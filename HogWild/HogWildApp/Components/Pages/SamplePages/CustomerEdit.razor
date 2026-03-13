@@ -1,8 +1,8 @@
 ﻿@page "/SamplePages/CustomerEdit/{CustomerID:int}"
 
-<PageTitle>Customer Edit</PageTitle>
+<PageTitleCustomer Edit></PageTitleCustomer>
 
-@if(CustomerID == 0)
+@if (CustomerID == 0)
 {
     <MudText Typo="Typo.h3">New Customer</MudText>
 }
@@ -33,73 +33,151 @@ else
     </MudAlert>
 }
 
-<MudForm @ref="customerForm">
+<MudForm @ref="customerForm" @bind-IsValid="isFormValid">
     <MudGrid>
-        <!-- Column one-->
+        <!-- Column One-->
         <MudItem xs="6">
             <MudTextField Label="First Name"
-                        @bind-Value="customer.FirstName"
-                        Variant="Variant.Outlined"
-                        Required="true"
-                        RequiredError="First name is required"
-                        MaxLength="20"
-                        Immediate="true"/>
-            <MudTextField Label="Last Name"
-                          @bind-Value="customer.LastName"
+                          Value="customer.FirstName"
+                          ValueChanged="@((string s) => { customer.FirstName = s;
+                                            OnFieldChanged();
+                                        })"
                           Variant="Variant.Outlined"
                           Required="true"
-                          RequiredError="Last name is required"
+                          RequiredError="First Name is required"
+                          MaxLength="20"
+                          Immediate="true"
+            />
+            <MudTextField Label="Last Name"
+                          Value="customer.LastName"
+                          ValueChanged="@((string s) => { customer.LastName = s;
+                                            OnFieldChanged();
+                                        })"
+                          Variant="Variant.Outlined"
+                          Required="true"
+                          RequiredError="Last Name is required"
                           MaxLength="50"
-                          Immediate="true" />
+                          Immediate="true"
+            />
             <MudTextField Label="Address 1"
-                          @bind-Value="customer.Address1"
+                          Value="customer.Address1"
+                          ValueChanged="@((string s) => { customer.Address1 = s;
+                                            OnFieldChanged();
+                                        })"
                           Variant="Variant.Outlined"
                           Required="true"
                           RequiredError="Address 1 is required"
                           MaxLength="50"
-                          Immediate="true" />
+                          Immediate="true"
+            />
             <MudTextField Label="Address 2"
-                          @bind-Value="customer.Address2"
+                          Value="customer.Address2"
+                          ValueChanged="@((string s) => { customer.Address2 = s;
+                                            OnFieldChanged();
+                                        })"
                           Variant="Variant.Outlined"
-                          MaxLength="0"
-                          Immediate="true" />
+                          MaxLength="50"
+                          Immediate="true"
+            />
             <MudTextField Label="City"
-                          @bind-Value="customer.City"
+                          Value="customer.City"
+                          ValueChanged="@((string s) => { customer.City = s;
+                                            OnFieldChanged();
+                                        })"
                           Variant="Variant.Outlined"
                           Required="true"
                           RequiredError="City is required"
                           MaxLength="50"
-                          Immediate="true" />
-            <MudSelect @bind-Value="customer.ProvStateID"
+                          Immediate="true"
+            />
+            <MudSelect  Value="customer.ProvStateID"
+                        ValueChanged="@((int? i) => { customer.ProvStateID = i;
+                                          OnFieldChanged();
+                                      })"
                        Variant="Variant.Outlined"
-                       Label="Province"
                        Placeholder="Please select a province"
                        Required="true"
-                       RequiredError="You must select a Province">
-                       @foreach (var item in provinces)
-                       {
-                           <MudSelectItem T="int?" Value="@item.LookupID">@item.Name</MudSelectItem>
-                       }
+                       RequiredError="City is required">
+                @foreach (var item in provinces)
+                {
+                    <MudSelectItem T="int?" Value="@item.LookupID">@item.Name</MudSelectItem>
+                }
             </MudSelect>
+        </MudItem>
+        <!-- Column Two-->
+        <MudItem xs="6">
+            <MudSelect Value="customer.CountryID"
+                       ValueChanged="@((int? i) => { customer.CountryID = i;
+                                         OnFieldChanged();
+                                     })"
+                       Variant="Variant.Outlined"
+                       Placeholder="Please select a country"
+                       Required="true"
+                       RequiredError="Country is required">
+                @foreach (var item in countries)
+                {
+                    <MudSelectItem T="int?" Value="@item.LookupID">@item.Name</MudSelectItem>
+                }
+            </MudSelect>
+            <MudTextField Label="Postal Code"
+                          Value="customer.PostalCode"
+                          ValueChanged="@((string s) => { customer.PostalCode = s;
+                                            OnFieldChanged();
+                                        })"
+                          Variant="Variant.Outlined"
+                          Required="true"
+                          RequiredError="Postal Code is required"
+                          MaxLength="20"
+                          Immediate="true"/>
+            <MudTextField Label="Phone Number"
+                          Value="customer.Phone"
+                          ValueChanged="@((string s) => { customer.Phone = s;
+                                            OnFieldChanged();
+                                        })"
+                          Variant="Variant.Outlined"
+                          Required="true"
+                          RequiredError="Postal Code is required"
+                          MaxLength="20"
+                          Format="###-###-####"
+                          Immediate="true"/>
+            <MudTextField Label="Email"
+                          Value="customer.Email"
+                          ValueChanged="@((string s) => { customer.Email = s;
+                                            OnFieldChanged();
+                                        })"
+                          Variant="Variant.Outlined"
+                          Required="true"
+                          RequiredError="Email is required"
+                          MaxLength="250"
+                          InputType="InputType.Email"
+                          Immediate="true"/>
+            <MudSelect Value="customer.StatusID"
+                       ValueChanged="@((int? i) => { customer.StatusID = i;
+                                         OnFieldChanged();
+                                     })"
+                       Variant="Variant.Outlined"
+                       Placeholder="Please select a status"
+                       Required="true"
+                       RequiredError="Status is required">
+                @foreach (var item in statusLookups)
+                {
+                    <MudSelectItem T="int?" Value="@item.LookupID">@item.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       OnClick="Save"
+                       Disabled="@(!isFormValid || !isDirty)">
+                Save
+            </MudButton>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Error"
+                       OnClick="Cancel"
+                       Class="ml-4">
+                @closeButtonText
+            </MudButton>
         </MudItem>
     </MudGrid>
 </MudForm>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
