@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace AuthenticationService
 {
     public class Program
@@ -35,9 +36,11 @@ namespace AuthenticationService
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<IdentityRole>()  // Enables role-based authorization and adds role-related services,
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddSignInManager()
-                .AddDefaultTokenProviders();
+                .AddDefaultTokenProviders()
+                .AddRoleManager<RoleManager<IdentityRole>>();  // Adds the role manager service for managing roles
 
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
